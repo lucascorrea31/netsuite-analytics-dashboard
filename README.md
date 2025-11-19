@@ -136,9 +136,9 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) first.
 
 ## 📧 Contact
 
-Your Name - [@yourtwitter](https://twitter.com/yourtwitter)
+Lucas Correa - [@lucascorrea_31](https://twitter.com/lucascorrea_31)
 
-Project Link: [https://github.com/YOUR_USERNAME/netsuite-analytics-dashboard](https://github.com/YOUR_USERNAME/netsuite-analytics-dashboard)
+Project Link: [https://github.com/lucascorrea31/netsuite-analytics-dashboard](https://github.com/lucascorrea31/netsuite-analytics-dashboard)
 
 ---
 
