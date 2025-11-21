@@ -72,7 +72,10 @@ export class NetSuiteClient {
    * Get a record by type and ID
    */
   async getRecord(recordType: string, id: string): Promise<any> {
-    const url = `https://${this.accountId}.suitetalk.api.netsuite.com/services/rest/record/${this.apiVersion}/${recordType}/${id}`;
+    // Convert account ID to URL format (replace _ with - and lowercase)
+    const accountIdForUrl = this.accountId.replace('_', '-').toLowerCase();
+    
+    const url = `https://${accountIdForUrl}.suitetalk.api.netsuite.com/services/rest/record/${this.apiVersion}/${recordType}/${id}`;
     const token = await this.auth.getAccessToken();
 
     const response = await fetch(url, {
@@ -97,7 +100,10 @@ export class NetSuiteClient {
    * Build SuiteQL endpoint URL with query parameters
    */
   private buildSuiteQLUrl(limit: number, offset: number): string {
-    const baseUrl = `https://${this.accountId}.suitetalk.api.netsuite.com/services/rest/query/${this.apiVersion}/suiteql`;
+    // Convert account ID to URL format (replace _ with - and lowercase)
+    const accountIdForUrl = this.accountId.replace('_', '-').toLowerCase();
+    
+    const baseUrl = `https://${accountIdForUrl}.suitetalk.api.netsuite.com/services/rest/query/${this.apiVersion}/suiteql`;
     const params = new URLSearchParams({
       limit: limit.toString(),
       offset: offset.toString(),

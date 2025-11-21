@@ -47,14 +47,23 @@ export class NetSuiteAuth {
   private async generateAccessToken(): Promise<string> {
     try {
       // Read private key
+      console.log('📂 Reading private key from:', this.config.privateKeyPath);
       const privateKey = readFileSync(this.config.privateKeyPath, 'utf8');
+      console.log('✅ Private key loaded successfully');
 
       // Create JWT assertion
+      console.log('🔐 Creating JWT assertion...');
       const assertion = this.createJWTAssertion(privateKey);
+      console.log('✅ JWT assertion created');
 
+      // Convert account ID to URL format (replace _ with - and lowercase)
+      const accountIdForUrl = this.config.accountId.replace('_', '-').toLowerCase();
+      
       // Exchange JWT for access token
-      const tokenUrl = `https://${this.config.accountId}.suitetalk.api.netsuite.com/services/rest/auth/oauth2/v1/token`;
+      const tokenUrl = `https://${accountIdForUrl}.suitetalk.api.netsuite.com/services/rest/auth/oauth2/v1/token`;
+      console.log('🌐 Token URL:', tokenUrl);
 
+      console.log('📡 Sending token request...');
       const response = await fetch(tokenUrl, {
         method: 'POST',
         headers: {
@@ -68,14 +77,18 @@ export class NetSuiteAuth {
         }),
       });
 
+      console.log('📨 Response status:', response.status, response.statusText);
+
       if (!response.ok) {
         const errorText = await response.text();
+        console.error('❌ Error response body:', errorText);
         throw new Error(
           `NetSuite OAuth failed (${response.status}): ${errorText}`
         );
       }
 
       const data = (await response.json()) as AccessTokenResponse;
+      console.log('✅ Token received successfully');
 
       // Cache token with expiry
       this.cachedToken = data.access_token;
@@ -83,6 +96,7 @@ export class NetSuiteAuth {
 
       return data.access_token;
     } catch (error) {
+      console.error('❌ Full error details:', error);
       throw new Error(
         `Failed to generate NetSuite access token: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
@@ -95,13 +109,21 @@ export class NetSuiteAuth {
   private createJWTAssertion(privateKey: string): string {
     const now = Math.floor(Date.now() / 1000);
 
+    // Convert account ID to URL format for audience
+    const accountIdForUrl = this.config.accountId.replace('_', '-').toLowerCase();
+
     const payload = {
       iss: this.config.consumerKey,
       scope: ['rest_webservices', 'suite_analytics'],
-      aud: `https://${this.config.accountId}.suitetalk.api.netsuite.com/services/rest/auth/oauth2/v1/token`,
+      aud: `https://${accountIdForUrl}.suitetalk.api.netsuite.com/services/rest/auth/oauth2/v1/token`,
       exp: now + 300, // 5 minutes
       iat: now,
     };
+
+    console.log('📝 JWT Payload:', {
+      ...payload,
+      iss: this.config.consumerKey.substring(0, 10) + '...',
+    });
 
     return jwt.sign(payload, privateKey, {
       algorithm: 'RS256',
